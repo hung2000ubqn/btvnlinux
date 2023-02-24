@@ -1,0 +1,46 @@
+1 và 3. Phân biệt program/process/thread
+Program là một nhóm các câu lệnh thực thi một nhiệm cụ thể, được thể hiện bằng các file thực thi và nằm trên ổ cứng máy tính. 
+Program được đọc vào bộ nhớ chính và thực hiện b?i kernel, còn được coi là thực thể thụ động tồn tại liên tục trong bộ nhớ ngay cả khi máy khởi động lại
+Process là một chương trình (program) đang được thực thi và sử dụng tài nguyên của hệ thống.
+Process ngược lại là thực thể đang hoạt động luôn được lưu trữ trên Ram và sẽ mất nếu tắt nguồn hệ thống.
+Tùy hệ điều hành (OS) 1 process có gồm nhiều thread xử lý đồng thời nhiều task
+Thread là một lightweight process có thể được quản lý độc lập bởi bộ lập lịch.
+Thread tương tự như 1 process nhưng thực thi trong 1 process và được phân bổ tài nguyên bởi kernel.
+Các Thread chạy trong 1 process được chia sẻ chung không gian địa chỉ, file descriptor, bộ nhớ ngăn xếp.
+Các thread có thể hoạt động song song thực hiện nhiều tác vụ khác nhau tuy nhiên nếu 1 thread thoát ra thì
+tất cả các thread khác đều kết thúc không giống với process khi 1 process kết thúc thì các process khác vẫn hoạt động bình thường.
+2. Context Switching liên quan đến việc lưu trữ context hoặc trạng thái của 1 process để nó có thể 
+reload lại khi được yêu cầu và thực thi từ cùng 1 thời điểm trước đó. Đó là tính năng của hệ điều hành đa nhiệm
+cho phép 1 CPU được chia sẻ bởi nhiều process.
+Ví dụ context switching: Process 1 chạy. Process 1 kết thúc (switched out) process 2 được bật (switched in) bởi ngắt hoặc system call
+Context switching lưu trạng thái (state) của process 1 vào pcb1 và load trạng thái của process 2 vào pcb2. Sau 1 thời gian, context
+switch xảy ra và process 2 bị kết thúc và process 1 được hoạt động lại. state của process 2 sẽ được lưu lại vào pcb2 và state của process 1
+từ pcb1 sẽ được load lại để thực hiện
+Có 3 cách để kích hoạt context switching: multitasking (tác vụ đa luồng), interrupt handling(hàm xử lý ngắt) và sự chuyển đổi từ chế độ user và kernel 
+Các bước thực hiện context switching:
++ lưu context của process đang chạy trên CPU. Update khối điều khiển process, và các phần quan trọng khác
++ di chuyển khối điều khiển process của process trước đó vào 1 queue liên quan như ready queue, i/o queue ...
++ lựa chọn process mới để thực thi
++ Update khối điều khiển process của process mới đó, bao gồm cả trạng thái để hoạt động.
++ update bộ nhớ quản lý dữ liệu struct yêu cầu
++ Khôi phục context của process đang chạy trước đó khi nó được load lại lên vi xử lý. Kết thúc
+khi load giá trị trước đó của khối điều khiển process và các thanh ghi.
+4. Các hàm thao tác vs thread như pthread_kill, pthread_create, pthread_self, pthread_equal, pthread_exit, pthread_join ...
+pthread_create(&thread_id1, NULL, &handle_th1, NULL);
+pthread_kill(thread_id1, SIGINT);
+pthread_join(thread_id1, NULL);
+pthread_exit(NULL);
+5. Cặp system để quản lý thread là pthread_join, pthread_detach, pthread_exit
+6. Mặc định, một thread là joinable , tức là khi thread kết thúc thì một thread khác có thể thu được giá trị trả về của thread đó thôn qua pthread_join().
+Tuy nhiên, nhiều trường hợp chúng ta không cần quan tâm về trạng thái kết thúc của thread mà chỉ cần hệ thống tự động clean và remove thread một cách tự động.
+Trường hợp này chúng ta có thể đặt thread vào trạng thái detached thông qua việc gọi pthread_detached().
+7. synchronization là quá trình đồng bộ hóa, có các phương pháp để xử lý bất đồng bộ hóa
++ Dùng khóa mutex
++ critical section
++ atomic/non-atomic
+8. 
++ Atomic: Tại một thời điểm chỉ có một thread duy nhất được truy cập vào tài nguyên được chia sẻ (shared resource). Vì vậy, atomic an toàn.
++ Nonatomic: Nhiều threads có thể truy cập vào shared resource cùng một thời điểm. Vì vậy, nonatomic không an toàn.
++ Thuật ngữ critical section được dùng để chỉ đoạn code truy cập vào vùng tài nguyên được chia sẻ giữa (shared resource) giữa các threads và việc thực thi của nó nằm trong bối cảnh atomic. Tức là, thời điểm đoạn code được thực thi sẽ không bị gián đoạn bởi bất cứ một thread nào truy cập đồng thời vào shared resource đó.
++ Mutex (mutual exclusion) là một kĩ thuật được sử dụng để đảm bảo rằng tại một thời điểm chỉ có 1 thread mới có quyền truy cập vào các tài nguyên dùng chung (shared resources).
+

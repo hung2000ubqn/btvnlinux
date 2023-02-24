@@ -33,8 +33,8 @@ int main(int argc, char const *argv[])
         	default:       printf("unknown?\n");                break;
         }
 
-    	printf("Thoi gian chinh sua file gan nhat: %s\n", ctime(&in4.st_mtim.tv_sec));
-	printf("Kich thuoc file:  %jd bytes\n", (intmax_t)in4.st_size);
+    	printf("Last time modified: %s\n", ctime(&in4.st_mtim.tv_sec));
+	printf("Size of file:  %jd bytes\n", (intmax_t)in4.st_size);
 	
 	return 0;
 }

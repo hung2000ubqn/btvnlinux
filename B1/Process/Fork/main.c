@@ -6,33 +6,33 @@
 int main(int argc, char const *argv[])   
 {
 
-	pid_t processA, w;                
+	pid_t processA, retv;                
 	int status;
 
 	processA = fork();         
 	if (processA >= 0) {
         	if (0 == processA) {
 			//Tien trinh con B	
-        		printf("\nDay la tien trinh con B\n");
+        		printf("\nChild Process B\n");
             		printf("PID: %d, PPID: %d\n", getpid(), getppid());
 		    	while(1);	
         	} else {               
 	    		//Tien trinh A
-            		printf("\nDay la tien trinh A\n");
+            		printf("\nParent Process A\n");
             		printf("PID: %d\n", getpid());
 	    		while (1) {
-	       			w = waitpid(processA, &status, WNOHANG);
+	       			retv = waitpid(processA, &status, WNOHANG);
 	       			if (w > 0) {
 					if (WIFEXITED(status)) {
-						printf("Process ket thuc binh thuong, trang thai = %d\n",WEXITSTATUS(status));
+						printf("Process terminated normally, trang thai = %d\n",WEXITSTATUS(status));
 					} else if (WIFSIGNALED(status)) {
-                       				printf("Process bi ket thuc boi signal %d\n", WTERMSIG(status));
+                       				printf("Process is killed by signal %d\n", WTERMSIG(status));
                    			} else if (WIFSTOPPED(status)) {
-                       				printf("Process bi dung boi signal %d\n", WSTOPSIG(status));
+                       				printf("Process is stopped by signal %d\n", WSTOPSIG(status));
                    			} else if (WIFCONTINUED(status)) {
-                       				printf("Process hoat dong binh thuong\n");
+                       				printf("Process run normally\n");
 					}
-				} else if (w == -1) {
+				} else if (retv == -1) {
 					printf("waitpid");
 					exit(EXIT_FAILURE);
 				}
