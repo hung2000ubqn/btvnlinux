@@ -53,7 +53,7 @@ static void *handle_th1(void *args)
    
     pthread_sigmask(SIG_BLOCK, &set, NULL);
     
-    sleep(20);
+    sleep(40);
 
     sigpending(&pending);
     print_sigset(&pending);
@@ -78,7 +78,7 @@ static void *handle_th2(void *args)
     pthread_sigmask(SIG_BLOCK, &set, NULL);
 
 
-    sleep(20);
+    sleep(40);
 
     sigpending(&pending);
     print_sigset(&pending);
@@ -86,16 +86,18 @@ static void *handle_th2(void *args)
     pthread_exit(NULL); // exit
 }
 
-static void *handle_th3(void *args)
+/*static void *handle_th3(void *args)
 { 
     pthread_t *thread_id1 = (pthread_t *)args;
     for(int i=0; i<5; i++) {
         pthread_kill(*thread_id1, SIGINT);
 	//pthread_kill(*thread_id2, SIGCHLD);
-	sleep(1);
+	sleep(2);
+    
     }
-    //pthread_exit(NULL);
-}
+    sleep(40);
+    pthread_exit(NULL);
+}*/
 
 int main(int argc, char const *argv[])
 {
@@ -116,17 +118,24 @@ int main(int argc, char const *argv[])
         return -1;
     }
     
-    if (ret = pthread_create(&thread_id3, NULL, &handle_th3, &thread_id1)) {
+    /*if (ret = pthread_create(&thread_id3, NULL, &handle_th3, &thread_id1)) {
         printf("pthread_create() error number=%d\n", ret);
         return -1;
-    }
+    }*/
 
+    sleep(5);
+
+    pthread_kill(thread_id1, SIGINT);
+    pthread_kill(thread_id2, SIGCHLD);
+
+    sleep(2);
+    pthread_kill(thread_id1, SIGINT);
 
 
     // used to block for the end of a thread and release
     pthread_join(thread_id1,NULL);  
     pthread_join(thread_id2,NULL);
-    pthread_join(thread_id3,NULL);
+    //pthread_join(thread_id3,NULL);
 
     return 0;
 }
